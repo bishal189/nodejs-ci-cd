@@ -16,14 +16,14 @@ jobs:
     environment: testing
     runs-on: ubuntu-latest
 
-    container:
-      image: node:16
+    # container:
+    #   image: node:16
 
     services:
       mongodb:
         image: mongo:5
-        # ports:
-        #   - 27017:27017
+        ports:
+          - 27017:27017
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: password
@@ -31,7 +31,7 @@ jobs:
     env:
       MONGODB_CONNECTION_PROTOCOL: mongodb
       MONGODB_DB_NAME: gha-demo
-      MONGODB_CLUSTER_ADDRESS: mongodb # This name comes from the `services` key
+      MONGODB_CLUSTER_ADDRESS: localhost # This name comes from the `services` key
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: password
       PORT: 8080
@@ -61,3 +61,14 @@ jobs:
           echo "MongoDB Host: $MONGODB_CLUSTER_ADDRESS"
           echo "MongoDB Username: $MONGODB_USERNAME"
           echo "MongoDB DB Name: $MONGODB_DB_NAME"
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output information
+        env:
+          PORT: 3000
+        run: |
+          echo "MONGODB_DB_NAME: $MONGODB_DB_NAME"
+          echo "MONGODB_USERNAME: $MONGODB_USERNAME"
+          echo "${{ env.PORT }}"
